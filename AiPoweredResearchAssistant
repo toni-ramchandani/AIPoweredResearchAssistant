@@ -1,0 +1,643 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "gpuType": "T4",
+      "authorship_tag": "ABX9TyPZuUNnti07CBpRbSrPgYqM",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    },
+    "accelerator": "GPU"
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/toni-ramchandani/AIPoweredResearchAssistant/blob/main/AiPoweredResearchAssistant\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "IWJ72QK101nA",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "f4fa0906-2a57-4338-e2ee-a81c1cde43a6"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Collecting langchain-community\n",
+            "  Downloading langchain_community-0.3.19-py3-none-any.whl.metadata (2.4 kB)\n",
+            "Requirement already satisfied: langchain-core in /usr/local/lib/python3.11/dist-packages (0.3.43)\n",
+            "Collecting streamlit\n",
+            "  Downloading streamlit-1.43.2-py2.py3-none-any.whl.metadata (8.9 kB)\n",
+            "Requirement already satisfied: langchain in /usr/local/lib/python3.11/dist-packages (0.3.20)\n",
+            "Collecting python-dotenv\n",
+            "  Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)\n",
+            "Collecting langchain_groq\n",
+            "  Downloading langchain_groq-0.2.5-py3-none-any.whl.metadata (2.6 kB)\n",
+            "Requirement already satisfied: transformers in /usr/local/lib/python3.11/dist-packages (4.48.3)\n",
+            "Collecting scholarly\n",
+            "  Downloading scholarly-1.7.11-py3-none-any.whl.metadata (7.4 kB)\n",
+            "Collecting autogen\n",
+            "  Downloading autogen-0.8.1-py3-none-any.whl.metadata (19 kB)\n",
+            "Requirement already satisfied: SQLAlchemy<3,>=1.4 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (2.0.38)\n",
+            "Requirement already satisfied: requests<3,>=2 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (2.32.3)\n",
+            "Requirement already satisfied: PyYAML>=5.3 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (6.0.2)\n",
+            "Requirement already satisfied: aiohttp<4.0.0,>=3.8.3 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (3.11.13)\n",
+            "Requirement already satisfied: tenacity!=8.4.0,<10,>=8.1.0 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (9.0.0)\n",
+            "Collecting dataclasses-json<0.7,>=0.5.7 (from langchain-community)\n",
+            "  Downloading dataclasses_json-0.6.7-py3-none-any.whl.metadata (25 kB)\n",
+            "Collecting pydantic-settings<3.0.0,>=2.4.0 (from langchain-community)\n",
+            "  Downloading pydantic_settings-2.8.1-py3-none-any.whl.metadata (3.5 kB)\n",
+            "Requirement already satisfied: langsmith<0.4,>=0.1.125 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (0.3.13)\n",
+            "Collecting httpx-sse<1.0.0,>=0.4.0 (from langchain-community)\n",
+            "  Downloading httpx_sse-0.4.0-py3-none-any.whl.metadata (9.0 kB)\n",
+            "Requirement already satisfied: numpy<3,>=1.26.2 in /usr/local/lib/python3.11/dist-packages (from langchain-community) (1.26.4)\n",
+            "Requirement already satisfied: jsonpatch<2.0,>=1.33 in /usr/local/lib/python3.11/dist-packages (from langchain-core) (1.33)\n",
+            "Requirement already satisfied: packaging<25,>=23.2 in /usr/local/lib/python3.11/dist-packages (from langchain-core) (24.2)\n",
+            "Requirement already satisfied: typing-extensions>=4.7 in /usr/local/lib/python3.11/dist-packages (from langchain-core) (4.12.2)\n",
+            "Requirement already satisfied: pydantic<3.0.0,>=2.5.2 in /usr/local/lib/python3.11/dist-packages (from langchain-core) (2.10.6)\n",
+            "Requirement already satisfied: altair<6,>=4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (5.5.0)\n",
+            "Requirement already satisfied: blinker<2,>=1.0.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (1.9.0)\n",
+            "Requirement already satisfied: cachetools<6,>=4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (5.5.2)\n",
+            "Requirement already satisfied: click<9,>=7.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (8.1.8)\n",
+            "Requirement already satisfied: pandas<3,>=1.4.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (2.2.2)\n",
+            "Requirement already satisfied: pillow<12,>=7.1.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (11.1.0)\n",
+            "Requirement already satisfied: protobuf<6,>=3.20 in /usr/local/lib/python3.11/dist-packages (from streamlit) (4.25.6)\n",
+            "Requirement already satisfied: pyarrow>=7.0 in /usr/local/lib/python3.11/dist-packages (from streamlit) (18.1.0)\n",
+            "Requirement already satisfied: toml<2,>=0.10.1 in /usr/local/lib/python3.11/dist-packages (from streamlit) (0.10.2)\n",
+            "Collecting watchdog<7,>=2.1.5 (from streamlit)\n",
+            "  Downloading watchdog-6.0.0-py3-none-manylinux2014_x86_64.whl.metadata (44 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m44.3/44.3 kB\u001b[0m \u001b[31m2.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hRequirement already satisfied: gitpython!=3.1.19,<4,>=3.0.7 in /usr/local/lib/python3.11/dist-packages (from streamlit) (3.1.44)\n",
+            "Collecting pydeck<1,>=0.8.0b4 (from streamlit)\n",
+            "  Downloading pydeck-0.9.1-py2.py3-none-any.whl.metadata (4.1 kB)\n",
+            "Requirement already satisfied: tornado<7,>=6.0.3 in /usr/local/lib/python3.11/dist-packages (from streamlit) (6.4.2)\n",
+            "Requirement already satisfied: langchain-text-splitters<1.0.0,>=0.3.6 in /usr/local/lib/python3.11/dist-packages (from langchain) (0.3.6)\n",
+            "Collecting groq<1,>=0.4.1 (from langchain_groq)\n",
+            "  Downloading groq-0.19.0-py3-none-any.whl.metadata (15 kB)\n",
+            "Requirement already satisfied: filelock in /usr/local/lib/python3.11/dist-packages (from transformers) (3.17.0)\n",
+            "Requirement already satisfied: huggingface-hub<1.0,>=0.24.0 in /usr/local/lib/python3.11/dist-packages (from transformers) (0.28.1)\n",
+            "Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.11/dist-packages (from transformers) (2024.11.6)\n",
+            "Requirement already satisfied: tokenizers<0.22,>=0.21 in /usr/local/lib/python3.11/dist-packages (from transformers) (0.21.0)\n",
+            "Requirement already satisfied: safetensors>=0.4.1 in /usr/local/lib/python3.11/dist-packages (from transformers) (0.5.3)\n",
+            "Requirement already satisfied: tqdm>=4.27 in /usr/local/lib/python3.11/dist-packages (from transformers) (4.67.1)\n",
+            "Collecting arrow (from scholarly)\n",
+            "  Downloading arrow-1.3.0-py3-none-any.whl.metadata (7.5 kB)\n",
+            "Requirement already satisfied: beautifulsoup4 in /usr/local/lib/python3.11/dist-packages (from scholarly) (4.13.3)\n",
+            "Collecting bibtexparser (from scholarly)\n",
+            "  Downloading bibtexparser-1.4.3.tar.gz (55 kB)\n",
+            "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m55.6/55.6 kB\u001b[0m \u001b[31m3.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25h  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "Requirement already satisfied: deprecated in /usr/local/lib/python3.11/dist-packages (from scholarly) (1.2.18)\n",
+            "Collecting fake-useragent (from scholarly)\n",
+            "  Downloading fake_useragent-2.1.0-py3-none-any.whl.metadata (17 kB)\n",
+            "Collecting free-proxy (from scholarly)\n",
+            "  Downloading free_proxy-1.1.3.tar.gz (5.6 kB)\n",
+            "  Preparing metadata (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "Requirement already satisfied: httpx in /usr/local/lib/python3.11/dist-packages (from scholarly) (0.28.1)\n",
+            "Collecting selenium (from scholarly)\n",
+            "  Downloading selenium-4.29.0-py3-none-any.whl.metadata (7.1 kB)\n",
+            "Collecting sphinx-rtd-theme (from scholarly)\n",
+            "  Downloading sphinx_rtd_theme-3.0.2-py2.py3-none-any.whl.metadata (4.4 kB)\n",
+            "Collecting pyautogen==0.8.1 (from autogen)\n",
+            "  Downloading pyautogen-0.8.1-py3-none-any.whl.metadata (29 kB)\n",
+            "Collecting asyncer==0.0.8 (from pyautogen==0.8.1->autogen)\n",
+            "  Downloading asyncer-0.0.8-py3-none-any.whl.metadata (6.7 kB)\n",
+            "Collecting diskcache (from pyautogen==0.8.1->autogen)\n",
+            "  Downloading diskcache-5.6.3-py3-none-any.whl.metadata (20 kB)\n",
+            "Collecting docker (from pyautogen==0.8.1->autogen)\n",
+            "  Downloading docker-7.1.0-py3-none-any.whl.metadata (3.8 kB)\n",
+            "Collecting fast-depends<3,>=2.4.12 (from pyautogen==0.8.1->autogen)\n",
+            "  Downloading fast_depends-2.4.12-py3-none-any.whl.metadata (7.6 kB)\n",
+            "Requirement already satisfied: termcolor in /usr/local/lib/python3.11/dist-packages (from pyautogen==0.8.1->autogen) (2.5.0)\n",
+            "Collecting tiktoken (from pyautogen==0.8.1->autogen)\n",
+            "  Downloading tiktoken-0.9.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.7 kB)\n",
+            "Requirement already satisfied: anyio<5.0,>=3.4.0 in /usr/local/lib/python3.11/dist-packages (from asyncer==0.0.8->pyautogen==0.8.1->autogen) (3.7.1)\n",
+            "Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (2.5.0)\n",
+            "Requirement already satisfied: aiosignal>=1.1.2 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.3.2)\n",
+            "Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (25.1.0)\n",
+            "Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.5.0)\n",
+            "Requirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (6.1.0)\n",
+            "Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (0.3.0)\n",
+            "Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp<4.0.0,>=3.8.3->langchain-community) (1.18.3)\n",
+            "Requirement already satisfied: jinja2 in /usr/local/lib/python3.11/dist-packages (from altair<6,>=4.0->streamlit) (3.1.6)\n",
+            "Requirement already satisfied: jsonschema>=3.0 in /usr/local/lib/python3.11/dist-packages (from altair<6,>=4.0->streamlit) (4.23.0)\n",
+            "Requirement already satisfied: narwhals>=1.14.2 in /usr/local/lib/python3.11/dist-packages (from altair<6,>=4.0->streamlit) (1.29.1)\n",
+            "Collecting marshmallow<4.0.0,>=3.18.0 (from dataclasses-json<0.7,>=0.5.7->langchain-community)\n",
+            "  Downloading marshmallow-3.26.1-py3-none-any.whl.metadata (7.3 kB)\n",
+            "Collecting typing-inspect<1,>=0.4.0 (from dataclasses-json<0.7,>=0.5.7->langchain-community)\n",
+            "  Downloading typing_inspect-0.9.0-py3-none-any.whl.metadata (1.5 kB)\n",
+            "Requirement already satisfied: gitdb<5,>=4.0.1 in /usr/local/lib/python3.11/dist-packages (from gitpython!=3.1.19,<4,>=3.0.7->streamlit) (4.0.12)\n",
+            "Requirement already satisfied: distro<2,>=1.7.0 in /usr/local/lib/python3.11/dist-packages (from groq<1,>=0.4.1->langchain_groq) (1.9.0)\n",
+            "Requirement already satisfied: sniffio in /usr/local/lib/python3.11/dist-packages (from groq<1,>=0.4.1->langchain_groq) (1.3.1)\n",
+            "Requirement already satisfied: certifi in /usr/local/lib/python3.11/dist-packages (from httpx->scholarly) (2025.1.31)\n",
+            "Requirement already satisfied: httpcore==1.* in /usr/local/lib/python3.11/dist-packages (from httpx->scholarly) (1.0.7)\n",
+            "Requirement already satisfied: idna in /usr/local/lib/python3.11/dist-packages (from httpx->scholarly) (3.10)\n",
+            "Requirement already satisfied: h11<0.15,>=0.13 in /usr/local/lib/python3.11/dist-packages (from httpcore==1.*->httpx->scholarly) (0.14.0)\n",
+            "Requirement already satisfied: fsspec>=2023.5.0 in /usr/local/lib/python3.11/dist-packages (from huggingface-hub<1.0,>=0.24.0->transformers) (2024.10.0)\n",
+            "Requirement already satisfied: jsonpointer>=1.9 in /usr/local/lib/python3.11/dist-packages (from jsonpatch<2.0,>=1.33->langchain-core) (3.0.0)\n",
+            "Requirement already satisfied: orjson<4.0.0,>=3.9.14 in /usr/local/lib/python3.11/dist-packages (from langsmith<0.4,>=0.1.125->langchain-community) (3.10.15)\n",
+            "Requirement already satisfied: requests-toolbelt<2.0.0,>=1.0.0 in /usr/local/lib/python3.11/dist-packages (from langsmith<0.4,>=0.1.125->langchain-community) (1.0.0)\n",
+            "Requirement already satisfied: zstandard<0.24.0,>=0.23.0 in /usr/local/lib/python3.11/dist-packages (from langsmith<0.4,>=0.1.125->langchain-community) (0.23.0)\n",
+            "Requirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.11/dist-packages (from pandas<3,>=1.4.0->streamlit) (2.8.2)\n",
+            "Requirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.11/dist-packages (from pandas<3,>=1.4.0->streamlit) (2025.1)\n",
+            "Requirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.11/dist-packages (from pandas<3,>=1.4.0->streamlit) (2025.1)\n",
+            "Requirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.11/dist-packages (from pydantic<3.0.0,>=2.5.2->langchain-core) (0.7.0)\n",
+            "Requirement already satisfied: pydantic-core==2.27.2 in /usr/local/lib/python3.11/dist-packages (from pydantic<3.0.0,>=2.5.2->langchain-core) (2.27.2)\n",
+            "Requirement already satisfied: charset-normalizer<4,>=2 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2->langchain-community) (3.4.1)\n",
+            "Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests<3,>=2->langchain-community) (2.3.0)\n",
+            "Requirement already satisfied: greenlet!=0.4.17 in /usr/local/lib/python3.11/dist-packages (from SQLAlchemy<3,>=1.4->langchain-community) (3.1.1)\n",
+            "Collecting types-python-dateutil>=2.8.10 (from arrow->scholarly)\n",
+            "  Downloading types_python_dateutil-2.9.0.20241206-py3-none-any.whl.metadata (2.1 kB)\n",
+            "Requirement already satisfied: soupsieve>1.2 in /usr/local/lib/python3.11/dist-packages (from beautifulsoup4->scholarly) (2.6)\n",
+            "Requirement already satisfied: pyparsing>=2.0.3 in /usr/local/lib/python3.11/dist-packages (from bibtexparser->scholarly) (3.2.1)\n",
+            "Requirement already satisfied: wrapt<2,>=1.10 in /usr/local/lib/python3.11/dist-packages (from deprecated->scholarly) (1.17.2)\n",
+            "Requirement already satisfied: lxml in /usr/local/lib/python3.11/dist-packages (from free-proxy->scholarly) (5.3.1)\n",
+            "Requirement already satisfied: PySocks!=1.5.7,>=1.5.6 in /usr/local/lib/python3.11/dist-packages (from requests[socks]->scholarly) (1.7.1)\n",
+            "Collecting trio~=0.17 (from selenium->scholarly)\n",
+            "  Downloading trio-0.29.0-py3-none-any.whl.metadata (8.5 kB)\n",
+            "Collecting trio-websocket~=0.9 (from selenium->scholarly)\n",
+            "  Downloading trio_websocket-0.12.2-py3-none-any.whl.metadata (5.1 kB)\n",
+            "Requirement already satisfied: websocket-client~=1.8 in /usr/local/lib/python3.11/dist-packages (from selenium->scholarly) (1.8.0)\n",
+            "Requirement already satisfied: sphinx<9,>=6 in /usr/local/lib/python3.11/dist-packages (from sphinx-rtd-theme->scholarly) (8.1.3)\n",
+            "Requirement already satisfied: docutils<0.22,>0.18 in /usr/local/lib/python3.11/dist-packages (from sphinx-rtd-theme->scholarly) (0.21.2)\n",
+            "Collecting sphinxcontrib-jquery<5,>=4 (from sphinx-rtd-theme->scholarly)\n",
+            "  Downloading sphinxcontrib_jquery-4.1-py2.py3-none-any.whl.metadata (2.6 kB)\n",
+            "Requirement already satisfied: smmap<6,>=3.0.1 in /usr/local/lib/python3.11/dist-packages (from gitdb<5,>=4.0.1->gitpython!=3.1.19,<4,>=3.0.7->streamlit) (5.0.2)\n",
+            "Requirement already satisfied: MarkupSafe>=2.0 in /usr/local/lib/python3.11/dist-packages (from jinja2->altair<6,>=4.0->streamlit) (3.0.2)\n",
+            "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (2024.10.1)\n",
+            "Requirement already satisfied: referencing>=0.28.4 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.36.2)\n",
+            "Requirement already satisfied: rpds-py>=0.7.1 in /usr/local/lib/python3.11/dist-packages (from jsonschema>=3.0->altair<6,>=4.0->streamlit) (0.23.1)\n",
+            "Requirement already satisfied: six>=1.5 in /usr/local/lib/python3.11/dist-packages (from python-dateutil>=2.8.2->pandas<3,>=1.4.0->streamlit) (1.17.0)\n",
+            "Requirement already satisfied: sphinxcontrib-applehelp>=1.0.7 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.0.0)\n",
+            "Requirement already satisfied: sphinxcontrib-devhelp>=1.0.6 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.0.0)\n",
+            "Requirement already satisfied: sphinxcontrib-htmlhelp>=2.0.6 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.1.0)\n",
+            "Requirement already satisfied: sphinxcontrib-jsmath>=1.0.1 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (1.0.1)\n",
+            "Requirement already satisfied: sphinxcontrib-qthelp>=1.0.6 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.0.0)\n",
+            "Requirement already satisfied: sphinxcontrib-serializinghtml>=1.1.9 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.0.0)\n",
+            "Requirement already satisfied: Pygments>=2.17 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.18.0)\n",
+            "Requirement already satisfied: snowballstemmer>=2.2 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.2.0)\n",
+            "Requirement already satisfied: babel>=2.13 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (2.17.0)\n",
+            "Requirement already satisfied: alabaster>=0.7.14 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (1.0.0)\n",
+            "Requirement already satisfied: imagesize>=1.3 in /usr/local/lib/python3.11/dist-packages (from sphinx<9,>=6->sphinx-rtd-theme->scholarly) (1.4.1)\n",
+            "Requirement already satisfied: sortedcontainers in /usr/local/lib/python3.11/dist-packages (from trio~=0.17->selenium->scholarly) (2.4.0)\n",
+            "Collecting outcome (from trio~=0.17->selenium->scholarly)\n",
+            "  Downloading outcome-1.3.0.post0-py2.py3-none-any.whl.metadata (2.6 kB)\n",
+            "Collecting wsproto>=0.14 (from trio-websocket~=0.9->selenium->scholarly)\n",
+            "  Downloading wsproto-1.2.0-py3-none-any.whl.metadata (5.6 kB)\n",
+            "Collecting mypy-extensions>=0.3.0 (from typing-inspect<1,>=0.4.0->dataclasses-json<0.7,>=0.5.7->langchain-community)\n",
+            "  Downloading mypy_extensions-1.0.0-py3-none-any.whl.metadata (1.1 kB)\n",
+            "Downloading langchain_community-0.3.19-py3-none-any.whl (2.5 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m2.5/2.5 MB\u001b[0m \u001b[31m56.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading streamlit-1.43.2-py2.py3-none-any.whl (9.7 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m9.7/9.7 MB\u001b[0m \u001b[31m87.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)\n",
+            "Downloading langchain_groq-0.2.5-py3-none-any.whl (15 kB)\n",
+            "Downloading scholarly-1.7.11-py3-none-any.whl (39 kB)\n",
+            "Downloading autogen-0.8.1-py3-none-any.whl (12 kB)\n",
+            "Downloading pyautogen-0.8.1-py3-none-any.whl (642 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m642.5/642.5 kB\u001b[0m \u001b[31m33.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading asyncer-0.0.8-py3-none-any.whl (9.2 kB)\n",
+            "Downloading dataclasses_json-0.6.7-py3-none-any.whl (28 kB)\n",
+            "Downloading groq-0.19.0-py3-none-any.whl (122 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m122.2/122.2 kB\u001b[0m \u001b[31m7.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading httpx_sse-0.4.0-py3-none-any.whl (7.8 kB)\n",
+            "Downloading pydantic_settings-2.8.1-py3-none-any.whl (30 kB)\n",
+            "Downloading pydeck-0.9.1-py2.py3-none-any.whl (6.9 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m6.9/6.9 MB\u001b[0m \u001b[31m77.9 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading watchdog-6.0.0-py3-none-manylinux2014_x86_64.whl (79 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m79.1/79.1 kB\u001b[0m \u001b[31m5.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading arrow-1.3.0-py3-none-any.whl (66 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m66.4/66.4 kB\u001b[0m \u001b[31m4.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading fake_useragent-2.1.0-py3-none-any.whl (125 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m125.8/125.8 kB\u001b[0m \u001b[31m8.2 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading selenium-4.29.0-py3-none-any.whl (9.5 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m9.5/9.5 MB\u001b[0m \u001b[31m91.7 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading sphinx_rtd_theme-3.0.2-py2.py3-none-any.whl (7.7 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m7.7/7.7 MB\u001b[0m \u001b[31m89.4 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading fast_depends-2.4.12-py3-none-any.whl (17 kB)\n",
+            "Downloading marshmallow-3.26.1-py3-none-any.whl (50 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m50.9/50.9 kB\u001b[0m \u001b[31m2.9 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading sphinxcontrib_jquery-4.1-py2.py3-none-any.whl (121 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m121.1/121.1 kB\u001b[0m \u001b[31m7.9 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading trio-0.29.0-py3-none-any.whl (492 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m492.9/492.9 kB\u001b[0m \u001b[31m28.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading trio_websocket-0.12.2-py3-none-any.whl (21 kB)\n",
+            "Downloading types_python_dateutil-2.9.0.20241206-py3-none-any.whl (14 kB)\n",
+            "Downloading typing_inspect-0.9.0-py3-none-any.whl (8.8 kB)\n",
+            "Downloading diskcache-5.6.3-py3-none-any.whl (45 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m45.5/45.5 kB\u001b[0m \u001b[31m2.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading docker-7.1.0-py3-none-any.whl (147 kB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m147.8/147.8 kB\u001b[0m \u001b[31m9.5 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading tiktoken-0.9.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.2 MB)\n",
+            "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m1.2/1.2 MB\u001b[0m \u001b[31m43.8 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+            "\u001b[?25hDownloading mypy_extensions-1.0.0-py3-none-any.whl (4.7 kB)\n",
+            "Downloading outcome-1.3.0.post0-py2.py3-none-any.whl (10 kB)\n",
+            "Downloading wsproto-1.2.0-py3-none-any.whl (24 kB)\n",
+            "Building wheels for collected packages: bibtexparser, free-proxy\n",
+            "  Building wheel for bibtexparser (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for bibtexparser: filename=bibtexparser-1.4.3-py3-none-any.whl size=43550 sha256=7133d3a44d495199bdd1eb538f6887d12e74ccd2afd142ba1f713e43fa085ad0\n",
+            "  Stored in directory: /root/.cache/pip/wheels/16/fb/76/306387739cf9d53b1c39b0c8aadbbb17dc05f256756d8fd915\n",
+            "  Building wheel for free-proxy (setup.py) ... \u001b[?25l\u001b[?25hdone\n",
+            "  Created wheel for free-proxy: filename=free_proxy-1.1.3-py3-none-any.whl size=6096 sha256=454bcd5fde14b42871bc95d32cef94ae53896add4eaf15868be2e1650eae5a17\n",
+            "  Stored in directory: /root/.cache/pip/wheels/9e/f8/90/1e74c4166b7fbb213260a35e83fac3119f5e390c8bddda8a37\n",
+            "Successfully built bibtexparser free-proxy\n",
+            "Installing collected packages: wsproto, watchdog, types-python-dateutil, python-dotenv, outcome, mypy-extensions, marshmallow, httpx-sse, fake-useragent, diskcache, bibtexparser, typing-inspect, trio, tiktoken, pydeck, free-proxy, docker, asyncer, arrow, trio-websocket, sphinxcontrib-jquery, pydantic-settings, groq, fast-depends, dataclasses-json, sphinx-rtd-theme, selenium, pyautogen, streamlit, scholarly, langchain_groq, autogen, langchain-community\n",
+            "Successfully installed arrow-1.3.0 asyncer-0.0.8 autogen-0.8.1 bibtexparser-1.4.3 dataclasses-json-0.6.7 diskcache-5.6.3 docker-7.1.0 fake-useragent-2.1.0 fast-depends-2.4.12 free-proxy-1.1.3 groq-0.19.0 httpx-sse-0.4.0 langchain-community-0.3.19 langchain_groq-0.2.5 marshmallow-3.26.1 mypy-extensions-1.0.0 outcome-1.3.0.post0 pyautogen-0.8.1 pydantic-settings-2.8.1 pydeck-0.9.1 python-dotenv-1.0.1 scholarly-1.7.11 selenium-4.29.0 sphinx-rtd-theme-3.0.2 sphinxcontrib-jquery-4.1 streamlit-1.43.2 tiktoken-0.9.0 trio-0.29.0 trio-websocket-0.12.2 types-python-dateutil-2.9.0.20241206 typing-inspect-0.9.0 watchdog-6.0.0 wsproto-1.2.0\n"
+          ]
+        }
+      ],
+      "source": [
+        "!pip install langchain-community langchain-core streamlit langchain python-dotenv langchain_groq transformers scholarly autogen"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile data_loader.py\n",
+        "import requests\n",
+        "import xml.etree.ElementTree as ET\n",
+        "from scholarly import scholarly\n",
+        "\n",
+        "class DataLoader:\n",
+        "    def __init__(self):\n",
+        "        print(\"DataLoader Init\")\n",
+        "    def fetch_arxiv_papers(self, query):\n",
+        "        \"\"\"\n",
+        "            Fetches top 5 research papers from ArXiv based on the user query.\n",
+        "            If <5 papers are found, expands the search using related topics.\n",
+        "\n",
+        "            Returns:\n",
+        "                list: A list of dictionaries containing paper details (title, summary, link).\n",
+        "        \"\"\"\n",
+        "\n",
+        "        def search_arxiv(query):\n",
+        "            \"\"\"Helper function to query ArXiv API.\"\"\"\n",
+        "            url = f\"http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results=5\"\n",
+        "            response = requests.get(url)\n",
+        "            if response.status_code == 200:\n",
+        "                root = ET.fromstring(response.text)\n",
+        "                return [\n",
+        "                    {\n",
+        "                        \"title\": entry.find(\"{http://www.w3.org/2005/Atom}title\").text,\n",
+        "                        \"summary\": entry.find(\"{http://www.w3.org/2005/Atom}summary\").text,\n",
+        "                        \"link\": entry.find(\"{http://www.w3.org/2005/Atom}id\").text\n",
+        "                    }\n",
+        "                    for entry in root.findall(\"{http://www.w3.org/2005/Atom}entry\")\n",
+        "                ]\n",
+        "            return []\n",
+        "\n",
+        "        papers = search_arxiv(query)\n",
+        "\n",
+        "        if len(papers) < 5 and self.search_agent:  # If fewer than 5 papers, expand search\n",
+        "            related_topics_response = self.search_agent.generate_reply(\n",
+        "                messages=[{\"role\": \"user\", \"content\": f\"Suggest 3 related research topics for '{query}'\"}]\n",
+        "            )\n",
+        "            related_topics = related_topics_response.get(\"content\", \"\").split(\"\\n\")\n",
+        "\n",
+        "            for topic in related_topics:\n",
+        "                topic = topic.strip()\n",
+        "                if topic and len(papers) < 5:\n",
+        "                    new_papers = search_arxiv(topic)\n",
+        "                    papers.extend(new_papers)\n",
+        "                    papers = papers[:5]  # Ensure max 5 papers\n",
+        "\n",
+        "        return papers\n",
+        "\n",
+        "    def fetch_google_scholar_papers(self, query):\n",
+        "        \"\"\"\n",
+        "            Fetches top 5 research papers from Google Scholar.\n",
+        "            Returns:\n",
+        "                list: A list of dictionaries containing paper details (title, summary, link)\n",
+        "        \"\"\"\n",
+        "        papers = []\n",
+        "        search_results = scholarly.search_pubs(query)\n",
+        "\n",
+        "        for i, paper in enumerate(search_results):\n",
+        "            if i >= 5:\n",
+        "                break\n",
+        "            papers.append({\n",
+        "                \"title\": paper[\"bib\"][\"title\"],\n",
+        "                \"summary\": paper[\"bib\"].get(\"abstract\", \"No summary available\"),\n",
+        "                \"link\": paper.get(\"pub_url\", \"No link available\")\n",
+        "            })\n",
+        "        return papers"
+      ],
+      "metadata": {
+        "id": "dev4B8ZZ1bfz",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "96b0165b-2d96-4759-e220-68d3b9568b85"
+      },
+      "execution_count": 30,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Overwriting data_loader.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile agents.py\n",
+        "\n",
+        "import os\n",
+        "from autogen import AssistantAgent\n",
+        "from dotenv import load_dotenv\n",
+        "\n",
+        "# Load environment variables\n",
+        "load_dotenv()\n",
+        "\n",
+        "class ResearchAgents:\n",
+        "    def __init__(self, api_key):\n",
+        "        self.groq_api_key = api_key\n",
+        "        self.llm_config = {'config_list': [{'model': 'llama-3.3-70b-versatile', 'api_key': '', 'api_type': \"groq\"}]}\n",
+        "\n",
+        "        # Summarizer Agent - Summarizes research papers\n",
+        "        self.summarizer_agent = AssistantAgent(\n",
+        "            name=\"summarizer_agent\",\n",
+        "            system_message=\"Summarize the retrieved research papers and present concise summaries to the user, JUST GIVE THE RELEVANT SUMMARIES OF THE RESEARCH PAPER AND NOT YOUR THOUGHT PROCESS.\",\n",
+        "            llm_config=self.llm_config,\n",
+        "            human_input_mode=\"NEVER\",\n",
+        "            code_execution_config=False\n",
+        "        )\n",
+        "\n",
+        "        # Advantages and Disadvantages Agent - Analyzes pros and cons\n",
+        "        self.advantages_disadvantages_agent = AssistantAgent(\n",
+        "            name=\"advantages_disadvantages_agent\",\n",
+        "            system_message=\"Analyze the summaries of the research papers and provide a list of advantages and disadvantages for each paper in a pointwise format. JUST GIVE THE ADVANTAGES AND DISADVANTAGES, NOT YOUR THOUGHT PROCESS\",\n",
+        "            llm_config=self.llm_config,\n",
+        "            human_input_mode=\"NEVER\",\n",
+        "            code_execution_config=False\n",
+        "        )\n",
+        "\n",
+        "    def summarize_paper(self, paper_summary):\n",
+        "        \"\"\"Generates a summary of the research paper.\"\"\"\n",
+        "        summary_response = self.summarizer_agent.generate_reply(\n",
+        "            messages=[{\"role\": \"user\", \"content\": f\"Summarize this paper: {paper_summary}\"}]\n",
+        "        )\n",
+        "        return summary_response.get(\"content\", \"Summarization failed!\") if isinstance(summary_response, dict) else str(summary_response)\n",
+        "\n",
+        "    def analyze_advantages_disadvantages(self, summary):\n",
+        "        \"\"\"Generates advantages and disadvantages of the research paper.\"\"\"\n",
+        "        adv_dis_response = self.advantages_disadvantages_agent.generate_reply(\n",
+        "            messages=[{\"role\": \"user\", \"content\": f\"Provide advantages and disadvantages for this paper: {summary}\"}]\n",
+        "        )\n",
+        "        return adv_dis_response.get(\"content\", \"Advantages and disadvantages analysis failed!\")"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "9Z2uvRUK3aNk",
+        "outputId": "5c47c9fd-8e9d-47b9-a721-a509d06507fa"
+      },
+      "execution_count": 31,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Overwriting agents.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%writefile app.py\n",
+        "import streamlit as st\n",
+        "import os\n",
+        "from dotenv import load_dotenv\n",
+        "from agents import ResearchAgents\n",
+        "from data_loader import DataLoader\n",
+        "\n",
+        "load_dotenv()\n",
+        "\n",
+        "print(\"ok\")\n",
+        "my_name = \"Toni Ramchandani\"\n",
+        "linked_profile = \"https://www.linkedin.com/in/toni-ramchandani\"\n",
+        "my_image_url = \"/content/ToniNewPic.jpg\"\n",
+        "my_book_details_link = \"https://www.amazon.in/Generative-Journey-Mastering-foundations-generative/dp/9365890845\"\n",
+        "my_book_image_url = \"https://m.media-amazon.com/images/I/71Sb6R2wufL._SL1360_.jpg\"\n",
+        "\n",
+        "# Sidebar with my details\n",
+        "with st.sidebar:\n",
+        "    st.image(my_image_url, width=150)\n",
+        "    st.markdown(f\"**{my_name}**\")\n",
+        "    st.markdown(f\"[LinkedIn]({linked_profile})\")\n",
+        "    st.markdown(f\"[📖 Check out my book!]({my_book_details_link})\")\n",
+        "\n",
+        "# Streamlit App UI\n",
+        "st.title(\"AI-powered Research Assistant 📑\")\n",
+        "# Streamlit UI Title\n",
+        "#st.title(\"📚 Virtual Research Assistant\")\n",
+        "\n",
+        "# Description of the app\n",
+        "st.markdown(\"\"\"\n",
+        "This app helps researchers, students, and professionals quickly find and summarize research papers.\n",
+        "\n",
+        "Simply enter a research query, and the app will fetch relevant papers from ArXiv and Google Scholar, providing concise summaries and insightful analyses.\n",
+        "\"\"\")\n",
+        "\n",
+        "# Retrieve the API key from environment variables\n",
+        "groq_api_key = ''\n",
+        "\n",
+        "# Check if API key is set, else stop execution\n",
+        "if not groq_api_key:\n",
+        "    st.error(\"GROQ_API_KEY is missing. Please set it in your environment variables.\")\n",
+        "    st.stop()\n",
+        "\n",
+        "# Initialize AI Agents for summarization and analysis\n",
+        "agents = ResearchAgents(groq_api_key)\n",
+        "\n",
+        "# Initialize DataLoader for fetching research papers\n",
+        "data_loader = DataLoader()\n",
+        "\n",
+        "# Input field for the user to enter a research topic\n",
+        "query = st.text_input(\"Enter a research topic:\")\n",
+        "\n",
+        "# When the user clicks \"Search\"\n",
+        "if st.button(\"Search\"):\n",
+        "    with st.spinner(\"Fetching research papers...\"):  # Show a loading spinner\n",
+        "\n",
+        "        # Fetch research papers from ArXiv and Google Scholar\n",
+        "        arxiv_papers = data_loader.fetch_arxiv_papers(query)\n",
+        "        #google_scholar_papers = data_loader.fetch_google_scholar_papers(query)\n",
+        "        #all_papers = arxiv_papers + google_scholar_papers  # Combine results from both sources\n",
+        "        all_papers = arxiv_papers\n",
+        "\n",
+        "        # If no papers are found, display an error message\n",
+        "        if not all_papers:\n",
+        "            st.error(\"Failed to fetch papers. Try again!\")\n",
+        "        else:\n",
+        "            processed_papers = []\n",
+        "\n",
+        "            # Process each paper: generate summary and analyze advantages/disadvantages\n",
+        "            for paper in all_papers:\n",
+        "                summary = agents.summarize_paper(paper['summary'])  # Generate summary\n",
+        "                adv_dis = agents.analyze_advantages_disadvantages(summary)  # Analyze pros/cons\n",
+        "\n",
+        "                processed_papers.append({\n",
+        "                    \"title\": paper[\"title\"],\n",
+        "                    \"link\": paper[\"link\"],\n",
+        "                    \"summary\": summary,\n",
+        "                    \"advantages_disadvantages\": adv_dis,\n",
+        "                })\n",
+        "\n",
+        "            # Display the processed research papers\n",
+        "            st.subheader(\"Top Research Papers for the topic:\")\n",
+        "            for i, paper in enumerate(processed_papers, 1):\n",
+        "                st.markdown(f\"### {i}. {paper['title']}\")  # Paper title\n",
+        "                st.markdown(f\"🔗 [Read Paper]({paper['link']})\")  # Paper link\n",
+        "                st.write(f\"**Summary:** {paper['summary']}\")  # Paper summary\n",
+        "                st.write(f\"{paper['advantages_disadvantages']}\")  # Pros/cons analysis\n",
+        "                st.markdown(\"---\")  # Separator between papers\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Ld-BwhWg3Lm6",
+        "outputId": "fc46868f-7b86-4770-bab0-6433d34c07aa"
+      },
+      "execution_count": 32,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Overwriting app.py\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!npm install localtunnel"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "VaWwSzB936BX",
+        "outputId": "394acd7c-1a1b-4e4a-f494-030b5be0a6b1"
+      },
+      "execution_count": 13,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1G\u001b[0K⠙\u001b[1G\u001b[0K⠹\u001b[1G\u001b[0K⠸\u001b[1G\u001b[0K⠼\u001b[1G\u001b[0K⠴\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K\n",
+            "up to date, audited 23 packages in 994ms\n",
+            "\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K\n",
+            "\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K3 packages are looking for funding\n",
+            "\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K  run `npm fund` for details\n",
+            "\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K\n",
+            "2 \u001b[31m\u001b[1mhigh\u001b[22m\u001b[39m severity vulnerabilities\n",
+            "\n",
+            "To address all issues (including breaking changes), run:\n",
+            "  npm audit fix --force\n",
+            "\n",
+            "Run `npm audit` for details.\n",
+            "\u001b[1G\u001b[0K⠦\u001b[1G\u001b[0K"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!streamlit run app.py &>/content/logs.txt &"
+      ],
+      "metadata": {
+        "id": "lUhAx4td4Fvz"
+      },
+      "execution_count": 33,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!wget -q -O - https://loca.lt/mytunnelpassword"
+      ],
+      "metadata": {
+        "id": "CNnOCKA45AIe",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "f3b0c787-2d40-4ad8-e8f0-7501ad815ab5"
+      },
+      "execution_count": 34,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "34.147.106.61"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!npx localtunnel --port 8501"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "Somxd0Yv4HCN",
+        "outputId": "c0d64e71-0125-424c-d0cc-6214cbb34db3"
+      },
+      "execution_count": 35,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\u001b[1G\u001b[0K⠙\u001b[1G\u001b[0Kyour url is: https://modern-steaks-scream.loca.lt\n",
+            "^C\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "stBh7gtOjTxh"
+      },
+      "execution_count": 16,
+      "outputs": []
+    }
+  ]
+}
